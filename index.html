@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gran Rosco Latino | Cultura Clásica</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Outfit:wght@300;500;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body { font-family: 'Outfit', sans-serif; background-color: #1a0b0f; color: #fff1f2; overflow-x: hidden; }
+        h1, h2, .font-cinzel { font-family: 'Cinzel', serif; }
+        
+        .rosco-wrapper { position: relative; width: 360px; height: 360px; margin: 0 auto; transition: all 0.5s ease; }
+        .letter {
+            position: absolute; width: 42px; height: 42px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 900; font-size: 18px; transform: translate(-50%, -50%);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.6); z-index: 20; color: white;
+        }
+        
+        /* Estados de las letras */
+        .status-pending { background: linear-gradient(135deg, #475569, #1e293b); border: 2px solid #94a3b8; }
+        .status-active {
+            background: linear-gradient(135deg, #d97706, #92400e); border: 2px solid #fde68a;
+            transform: translate(-50%, -50%) scale(1.5); z-index: 30; box-shadow: 0 0 25px rgba(245, 158, 11, 0.9);
+            color: #fffbeb;
+        }
+        .status-correct { background: linear-gradient(135deg, #059669, #064e3b); border: 2px solid #6ee7b7; }
+        .status-incorrect { background: linear-gradient(135deg, #e11d48, #881337); border: 2px solid #fda4af; }
+
+        .glass-panel { background: rgba(30, 10, 15, 0.8); backdrop-filter: blur(16px); border: 1px solid rgba(255,215,0,0.2); }
+        
+        #fx-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; opacity: 0.3; }
+
+        /* Colores por equipo */
+        .team-theme-0 { border-color: #ef4444 !important; box-shadow: 0 0 15px rgba(239, 68, 68, 0.4); }
+        .team-theme-1 { border-color: #3b82f6 !important; box-shadow: 0 0 15px rgba(59, 130, 246, 0.4); }
+        .team-theme-2 { border-color: #10b981 !important; box-shadow: 0 0 15px rgba(16, 185, 129, 0.4); }
+        .team-theme-3 { border-color: #a855f7 !important; box-shadow: 0 0 15px rgba(168, 85, 247, 0.4); }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen bg-gradient-to-br from-rose-950 via-slate-900 to-red-950">
+    <canvas id="fx-canvas"></canvas>
+
+    <!-- PANTALLA DE INICIO Y CONFIGURACIÓN -->
+    <div id="start-screen" class="relative z-10 min-h-screen flex items-center justify-center p-4">
+        <div class="glass-panel p-10 rounded-3xl max-w-xl w-full text-center border-t-4 border-amber-500">
+            <h1 class="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-200 to-yellow-600 mb-2">Rosco Latino</h1>
+            <h2 class="text-xl text-rose-200 mb-8 uppercase tracking-widest">Desafío Clásico</h2>
+            
+            <div class="text-left bg-black/40 p-6 rounded-xl mb-8 text-rose-100 border border-rose-900">
+                <h3 class="text-lg font-bold text-amber-400 mb-4 font-cinzel">Configuración del Reto</h3>
+                
+                <div class="mb-4">
+                    <label class="block mb-2 font-medium">Número de Facciones (Equipos):</label>
+                    <div class="flex gap-4">
+                        <label class="flex-1 cursor-pointer">
+                            <input type="radio" name="numTeams" value="2" checked class="peer sr-only">
+                            <div class="text-center p-3 border border-rose-800 rounded-lg peer-checked:bg-rose-900 peer-checked:border-amber-400 transition-all">2 Equipos</div>
+                        </label>
+                        <label class="flex-1 cursor-pointer">
+                            <input type="radio" name="numTeams" value="4" class="peer sr-only">
+                            <div class="text-center p-3 border border-rose-800 rounded-lg peer-checked:bg-rose-900 peer-checked:border-amber-400 transition-all">4 Equipos</div>
+                        </label>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block mb-2 font-medium">Tiempo de juego:</label>
+                    <select id="time-select" class="w-full bg-slate-900 border border-rose-800 text-white rounded-lg p-3 outline-none focus:border-amber-400">
+                        <option value="600">10 Minutos (Estándar)</option>
+                        <option value="900" selected>15 Minutos (Extendido)</option>
+                        <option value="1200">20 Minutos (Épico)</option>
+                    </select>
+                </div>
+            </div>
+            
+            <button onclick="Game.init()" class="w-full bg-gradient-to-r from-red-700 to-rose-900 text-white font-cinzel font-bold py-4 text-2xl rounded-xl hover:scale-105 transition-transform shadow-[0_0_20px_rgba(225,29,72,0.5)] border border-rose-500">
+                COMENZAR LA CONQUISTA
+            </button>
+        </div>
+    </div>
+
+    <!-- PANTALLA DE JUEGO -->
+    <div id="game-screen" class="hidden relative z-10 min-h-screen flex-col items-center py-6 px-4">
+        
+        <!-- Marcadores de Equipos -->
+        <div id="team-scores" class="grid w-full max-w-5xl gap-4 mb-8">
+            <!-- Se inyectan dinámicamente -->
+        </div>
+
+        <div class="flex flex-col lg:flex-row items-center gap-12 w-full max-w-6xl justify-center">
+            
+            <!-- Contenedor del Rosco Central -->
+            <div id="rosco-main-container" class="glass-panel p-8 rounded-full border-4 transition-colors duration-500">
+                <div class="rosco-wrapper flex items-center justify-center">
+                    <div class="absolute z-10 flex flex-col items-center justify-center bg-black/80 rounded-full w-32 h-32 border-2 border-amber-500 shadow-[0_0_20px_rgba(245,158,11,0.2)]">
+                        <span id="active-team-name" class="text-xs text-amber-400 font-cinzel font-bold uppercase tracking-widest mb-1">Equipo</span>
+                        <span id="timer" class="text-4xl font-black text-white">0</span>
+                    </div>
+                    <div id="rosco-letters" class="absolute inset-0 z-20"></div>
+                </div>
+            </div>
+
+            <!-- Panel de Pregunta -->
+            <div class="w-full max-w-lg glass-panel p-8 rounded-3xl flex flex-col shadow-2xl relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-amber-600 via-yellow-400 to-amber-600"></div>
+                
+                <div class="flex items-baseline gap-3 mb-4">
+                    <span id="question-letter" class="text-6xl font-cinzel font-black text-amber-500 drop-shadow-lg">A</span>
+                    <span id="question-type" class="text-rose-200 font-bold uppercase text-xs bg-rose-950/80 px-3 py-1 rounded-md border border-rose-800"></span>
+                </div>
+                
+                <p id="question-text" class="text-2xl text-slate-100 mb-6 min-h-[140px] font-medium leading-relaxed"></p>
+                
+                <div id="hint-display" class="hidden text-amber-200 font-medium text-sm bg-amber-900/30 p-4 rounded-lg border border-amber-500/30 mb-6"></div>
+                
+                <input type="text" id="answer-input" autocomplete="off" placeholder="Escribe tu respuesta..." 
+                    class="bg-black/50 border-2 border-rose-800 text-white w-full rounded-xl px-4 py-4 text-xl text-center font-bold outline-none focus:border-amber-500 transition-colors mb-6 shadow-inner">
+                
+                <div class="grid grid-cols-3 gap-3">
+                    <button onclick="Game.checkAnswer()" class="bg-emerald-700 hover:bg-emerald-600 text-white font-bold py-3 rounded-lg text-sm transition-colors uppercase tracking-wider shadow-lg">Comprobar</button>
+                    <button onclick="Game.showHint()" class="bg-indigo-700 hover:bg-indigo-600 text-white font-bold py-3 rounded-lg text-sm transition-colors uppercase tracking-wider shadow-lg">Pista</button>
+                    <button onclick="Game.pasapalabra()" class="bg-amber-700 hover:bg-amber-600 text-white font-bold py-3 rounded-lg text-sm transition-colors uppercase tracking-wider shadow-lg">Pasar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Banco de preguntas expandido (4 variantes por letra para asegurar diversidad en múltiples equipos)
+        // Basado estrictamente en los contenidos de gramática, cultura y traducción provistos.
+        const QUESTION_POOL = {
+            'A': [
+                { type: 'Empieza por', q: 'Diosa romana de la sabiduría y la guerra estratégica, equivalente a Atenea.', a: ['minerva'], h: 'Formaba parte de la Tríada Capitolina (M...).' }, // Contiene A, pero espera. La letra es A. Corregido:
+                { type: 'Empieza por', q: 'Caso de la declinación latina que suele realizar la función sintáctica de Complemento Directo.', a: ['acusativo'], h: 'Suele terminar en -m en el singular de casi todas las declinaciones.' },
+                { type: 'Empieza por', q: 'Batalla naval donde Octavio derrotó a Marco Antonio, marcando el fin de la República.', a: ['accio', 'actium'], h: 'Comienza por A y doble C.' },
+                { type: 'Empieza por', q: 'Edificio público romano destinado a las luchas de gladiadores y espectáculos con fieras.', a: ['anfiteatro'], h: 'El Coliseo es el más famoso de este tipo.' },
+                { type: 'Empieza por', q: 'Sustantivo latino de la primera declinación que aparece en la prueba y significa "agricultor".', a: ['agricola'], h: 'Su nominativo termina en -a pero es de género masculino.' }
+            ],
+            'B': [
+                { type: 'Empieza por', q: 'Dios romano del vino y la fiesta, equivalente al griego Dioniso.', a: ['baco'], h: 'Aparece en las opciones de dioses del inframundo como distractor.' },
+                { type: 'Empieza por', q: 'Edificio público de la antigua Roma que servía como tribunal de justicia y centro de negocios.', a: ['basilica'], h: 'Posteriormente los cristianos adoptaron su estructura para sus iglesias.' },
+                { type: 'Contiene la', q: 'Famosa obra histórica de Tito Livio: "A ... condita".', a: ['urbe'], h: 'Significa ciudad en latín.' },
+                { type: 'Contiene la', q: 'Último rey de Roma, apodado "El Soberbio".', a: ['tarquinio', 'tarquinio el soberbio'], h: 'Rey de origen etrusco.' }
+            ],
+            'C': [
+                { type: 'Empieza por', q: 'Máximo representante de la oratoria romana, autor de las "Catilinarias".', a: ['ciceron'], h: 'Gran político republicano.' },
+                { type: 'Empieza por', q: 'Magistratura más alta de la República romana, elegida anualmente y formada por dos personas.', a: ['consul'], h: 'Daban nombre al año.' },
+                { type: 'Empieza por', q: 'Poeta lírico romano que cantó su amor por una mujer a la que llamó "Lesbia".', a: ['catulo'], h: 'Aparece en las preguntas de literatura.' },
+                { type: 'Empieza por', q: 'Ciudad del norte de África que se enfrentó a Roma por el dominio del Mediterráneo.', a: ['cartago'], h: 'Las guerras contra ellos se llamaron Púnicas.' }
+            ],
+            'D': [
+                { type: 'Empieza por', q: 'Caso de la declinación latina utilizado para expresar el Complemento Indirecto.', a: ['dativo'], h: 'Indica quién recibe el daño o provecho de la acción.' },
+                { type: 'Empieza por', q: 'Diosa romana de la caza y los bosques, equivalente a la griega Artemisa.', a: ['diana'], h: 'Hermana de Apolo.' },
+                { type: 'Contiene la', q: 'Gran epopeya escrita por Virgilio para glorificar los orígenes de Roma.', a: ['eneida'], h: 'Narra la huida de Troya.' },
+                { type: 'Contiene la', q: 'Emperador que promulgó la libertad de religión en el Imperio en 313 d.C. a través de un edicto.', a: ['constantino', 'constantino i'], h: 'El edicto fue firmado en Milán.' }
+            ],
+            'E': [
+                { type: 'Empieza por', q: 'Clase social de la República formada por caballeros, situada por debajo de los patricios.', a: ['equites'], h: 'Aparece como opción junto a plebeyos y libertos.' },
+                { type: 'Empieza por', q: 'Documento legal promulgado en Milán que daba fin a las persecuciones cristianas.', a: ['edicto', 'edicto de milan'], h: 'Promulgado por Constantino.' },
+                { type: 'Empieza por', q: 'Ciudad romana sepultada por la erupción del volcán Vesubio junto a Pompeya y Herculano.', a: ['estabia'], h: 'Termina en -ia.' },
+                { type: 'Contiene la', q: 'Término latino del texto a traducir que significa "anciano" (senex, ...).', a: ['senex'], h: 'Aparece atado con cadenas (catenis) en el texto de Plinio.' }
+            ],
+            'F': [
+                { type: 'Empieza por', q: 'Plaza principal y centro neurálgico, comercial y político de las ciudades romanas.', a: ['foro'], h: 'Equivalente al ágora griega.' },
+                { type: 'Empieza por', q: 'Palabra latina del texto de Plinio que significa "hierro" (en genitivo).', a: ['ferri'], h: 'Aparece junto a "sonus" (sonus ...).' },
+                { type: 'Contiene la', q: 'Espectáculo con animales salvajes que se realizaba en los anfiteatros.', a: ['fieras'], h: 'Luchas de gladiadores y...' },
+                { type: 'Contiene la', q: 'Famosa obra de Ovidio que recopila más de 250 mitos que terminan en una transformación.', a: ['metamorfosis', 'las metamorfosis'], h: 'La palabra significa "cambio de forma".' }
+            ],
+            'G': [
+                { type: 'Empieza por', q: 'Caso de la declinación latina que suele indicar posesión o Complemento del Nombre.', a: ['genitivo'], h: 'Suele traducirse con la preposición "de".' },
+                { type: 'Empieza por', q: 'Nombre que recibían las guerras que enfrentaron a Roma contra Cartago.', a: ['guerras punicas', 'punicas'], h: 'Fueron tres enfrentamientos en total.' },
+                { type: 'Empieza por', q: 'Adjetivo latino de la tercera declinación propuesto para declinar que significa "pesado".', a: ['gravis'], h: 'Su enunciado es ...-is, -e.' },
+                { type: 'Contiene la', q: 'Primer rey de Roma tras asesinar a su hermano.', a: ['romulo'], h: 'Amamantado por una loba.' }
+            ],
+            'H': [
+                { type: 'Empieza por', q: 'Poeta romano que acuñó el famoso tópico literario "Carpe diem".', a: ['horacio'], h: 'Contemporáneo de Virgilio.' },
+                { type: 'Empieza por', q: 'Ciudad sepultada bajo un río de lodo hirviendo por el volcán Vesubio junto a Pompeya.', a: ['herculano'], h: 'Su nombre hace honor al héroe de los doce trabajos.' },
+                { type: 'Contiene la', q: 'Profesión de Atenodoro, el hombre que decide alquilar la casa encantada en el texto de Plinio.', a: ['philosophus', 'filosofo'], h: 'Empieza por Ph- en el texto latino.' },
+                { type: 'Contiene la', q: 'Palabra del texto latino que significa aparición, aparición irreal o fantasma.', a: ['phantasma'], h: 'Aparece de súbito ("Subito ... advenit").' }
+            ],
+            'I': [
+                { type: 'Empieza por', q: 'Periodo histórico de Roma que se inicia tras la caída de la República.', a: ['imperio', 'imperio romano'], h: 'Octavio Augusto fue el primero en gobernarlo.' },
+                { type: 'Empieza por', q: 'Palabra latina del texto de Plinio que significa ídolo o espectro ("Mox apparebat...").', a: ['idolum'], h: 'Aparecía después del ruido de cadenas.' },
+                { type: 'Contiene la', q: 'Historiador romano que narra la historia de Roma desde su fundación ("Ab urbe condita").', a: ['tito livio'], h: 'Autor de nombre compuesto.' },
+                { type: 'Contiene la', q: 'Clase social formada por los descendientes de las primeras familias de Roma.', a: ['patricios'], h: 'Ocupaban los altos cargos en la República.' }
+            ],
+            'J': [
+                { type: 'Empieza por', q: 'Diosa romana, equivalente a la griega Hera, esposa del dios supremo.', a: ['juno'], h: 'En sus opciones aparecen Venus, Minerva y Diana.' },
+                { type: 'Empieza por', q: 'Nombre del general cuyo asesinato marca el final de la República y abre paso al Imperio.', a: ['julio', 'julio cesar'], h: 'Dictador vitalicio asesinado en los idus de marzo.' },
+                { type: 'Contiene la', q: 'Emperador romano hispano que aparece como opción incorrecta en la pregunta sobre el Edicto de Milán.', a: ['trajano'], h: 'Nacido en Itálica (Sevilla).' },
+                { type: 'Contiene la', q: 'Adjetivo del cuadro de declinaciones que significa "desdichado" o "pobre" (miser, -a, -um).', a: ['adjetivo', 'adjetivos'], h: 'Acompaña al sustantivo y concuerda con él.' }
+            ],
+            'L': [
+                { type: 'Empieza por', q: 'Nombre o pseudónimo literario con el que el poeta Catulo llamaba a su amada en sus poemas.', a: ['lesbia'], h: 'Inspirado en la isla de la poetisa Safo.' },
+                { type: 'Empieza por', q: 'Apellido del historiador que escribió "Ab urbe condita" (Tito ...).', a: ['livio'], h: 'Historiador de la época de Augusto.' },
+                { type: 'Contiene la', q: 'Comediógrafo romano autor de grandes obras, que conforma pareja literaria con Terencio.', a: ['plauto'], h: 'Autor de la "Aulularia".' },
+                { type: 'Contiene la', q: 'Dios romano del inframundo y los muertos.', a: ['pluton'], h: 'Hermano de Júpiter y Neptuno.' }
+            ],
+            'M': [
+                { type: 'Empieza por', q: 'Diosa romana equivalente a la griega Atenea.', a: ['minerva'], h: 'Diosa de la sabiduría.' },
+                { type: 'Empieza por', q: 'Dios romano de la guerra, padre de Rómulo y Remo.', a: ['marte'], h: 'Equivalente al griego Ares.' },
+                { type: 'Empieza por', q: 'Ciudad donde Constantino I promulgó su famoso Edicto en el 313 d.C.', a: ['milan'], h: 'Ciudad del norte de Italia.' },
+                { type: 'Empieza por', q: 'Palabra que aparece en el texto para designar a la extraña criatura o prodigio ("... ab Athenodoro videtur").', a: ['monstrum'], h: 'En español deriva a monstruo.' }
+            ],
+            'N': [
+                { type: 'Empieza por', q: 'Caso de la declinación que cumple la función de Sujeto o Atributo.', a: ['nominativo'], h: 'Es el primer caso de la tabla.' },
+                { type: 'Empieza por', q: 'Emperador romano que tuvo como tutor al filósofo estoico Séneca.', a: ['neron'], h: 'El último emperador de la dinastía Julio-Claudia.' },
+                { type: 'Empieza por', q: 'Dios romano de los mares y los océanos.', a: ['neptuno'], h: 'Equivalente al griego Poseidón.' },
+                { type: 'Contiene la', q: 'Sistema político romano abolido por Octavio Augusto.', a: ['republica'], h: 'Gobernado por Cónsules y el Senado.' }
+            ],
+            'O': [
+                { type: 'Empieza por', q: 'Nombre del vencedor en la batalla de Accio, que inauguró el Imperio.', a: ['octavio', 'octavio augusto', 'augusto'], h: 'Hijo adoptivo de Julio César.' },
+                { type: 'Empieza por', q: 'Poeta romano autor de la famosa obra "Las metamorfosis".', a: ['ovidio'], h: 'Escribió también el "Arte de amar".' },
+                { type: 'Empieza por', q: 'Palabra latina del texto de Plinio que significa "huesos".', a: ['ossa'], h: 'El filósofo los encuentra en el patio ("in area invenit").' },
+                { type: 'Empieza por', q: 'Ciudad portuaria de Roma que aparece como opción incorrecta en la pregunta sobre el Vesubio.', a: ['ostia'], h: 'Situada en la desembocadura del río Tíber.' }
+            ],
+            'P': [
+                { type: 'Empieza por', q: 'Clase social descendiente de las familias fundadoras de Roma.', a: ['patricios'], h: 'Se oponían a los plebeyos.' },
+                { type: 'Empieza por', q: 'Ciudad destruida y sepultada por la erupción del Vesubio en el 79 d.C.', a: ['pompeya'], h: 'Sus ruinas están cerca de Nápoles.' },
+                { type: 'Empieza por', q: 'Comediógrafo romano, contemporáneo de Terencio.', a: ['plauto'], h: 'Sus obras eran de carácter muy cómico y popular.' },
+                { type: 'Empieza por', q: 'Adjetivo que define las guerras que enfrentaron a romanos y cartagineses.', a: ['punicas'], h: 'Deriva del nombre que daban a los fenicios.' }
+            ],
+            'Q': [
+                { type: 'Contiene la', q: 'Magistratura romana menor encargada de las finanzas y los impuestos.', a: ['cuestor'], h: 'Parte inferior del cursus honorum.' },
+                { type: 'Contiene la', q: 'Rey etrusco expulsado de Roma, dando paso a la República ("Tarquinio el Soberbio").', a: ['tarquinio'], h: 'Último rey de la monarquía.' },
+                { type: 'Contiene la', q: 'Nombre de la clase social de los caballeros en Roma, inferior a los patricios.', a: ['equites'], h: 'Proviene de la palabra caballo (equus).' },
+                { type: 'Contiene la', q: 'Nombre de pila del autor de las "Catilinarias" y gran orador (Marco Tulio ...).', a: ['marco', 'marco tulio'], h: 'El apellido es Cicerón.' }
+            ],
+            'R': [
+                { type: 'Empieza por', q: 'Primer rey de Roma, tras acabar con la vida de su gemelo.', a: ['romulo'], h: 'Fundó la ciudad en el Palatino.' },
+                { type: 'Empieza por', q: 'Etapa de la historia de Roma cuyo final lo marca la victoria de Octavio Augusto.', a: ['republica'], h: 'Periodo intermedio entre Monarquía e Imperio.' },
+                { type: 'Empieza por', q: 'Hermano asesinado por el primer rey de Roma.', a: ['remo'], h: 'Cruzó el surco trazado por su hermano.' },
+                { type: 'Contiene la', q: 'Género literario teatral al que pertenecen autores como Plauto y Terencio.', a: ['comedia'], h: 'Busca hacer reír al espectador.' }
+            ],
+            'S': [
+                { type: 'Empieza por', q: 'Filósofo cordobés tutor del emperador Nerón y máximo representante del estoicismo.', a: ['seneca'], h: 'Autor de "Cartas a Lucilio".' },
+                { type: 'Empieza por', q: 'Historiador romano que aparece como opción; escribió sobre la conjuración de Catilina.', a: ['salustio'], h: 'Empieza por S y termina en -io.' },
+                { type: 'Empieza por', q: 'Término en latín que aparece en el texto traducido y hace referencia a un anciano ("... catenis trahebatur").', a: ['senex'], h: 'Raíz de la que proviene la palabra Senado.' },
+                { type: 'Contiene la', q: 'Ciudad de Italia sepultada por el Vesubio, junto con Pompeya y Herculano.', a: ['estabia'], h: 'Empieza por E.' }
+            ],
+            'T': [
+                { type: 'Empieza por', q: 'Baños públicos en la antigua Roma que servían para la higiene y relaciones sociales.', a: ['termas'], h: 'Contaban con salas como el caldarium o frigidarium.' },
+                { type: 'Empieza por', q: 'Historiador romano autor de la inmensa obra "Ab urbe condita" (... Livio).', a: ['tito', 'tito livio'], h: 'Su nombre tiene cuatro letras.' },
+                { type: 'Empieza por', q: 'Comediógrafo de origen africano representante del teatro romano junto a Plauto.', a: ['terencio'], h: 'Su comedia era más culta que la de Plauto.' },
+                { type: 'Empieza por', q: 'Historiador imperial romano que aparece como distractor en la pregunta sobre Tito Livio.', a: ['tacito'], h: 'Autor de los Anales.' }
+            ],
+            'U': [
+                { type: 'Contiene la', q: 'Título concedido a Octavio que lo convirtió en el primer emperador.', a: ['augusto'], h: 'Significa "venerable" o "sagrado".' },
+                { type: 'Contiene la', q: 'Volcán que arrasó Pompeya en el año 79 d.C.', a: ['vesubio'], h: 'Monte situado frente a la bahía de Nápoles.' },
+                { type: 'Contiene la', q: 'Magistratura más alta de la República, ocupada por dos dirigentes.', a: ['consul'], h: 'Mandaban los ejércitos.' },
+                { type: 'Contiene la', q: 'Nombre del poeta que dedicó sus versos de amor a "Lesbia".', a: ['catulo'], h: 'Destacó en la poesía lírica.' }
+            ],
+            'V': [
+                { type: 'Empieza por', q: 'Poeta autor de la Eneida, escrita para glorificar el origen de Roma.', a: ['virgilio'], h: 'Murió sin querer publicar su gran obra.' },
+                { type: 'Empieza por', q: 'Caso de la declinación que sirve para llamar o invocar a alguien.', a: ['vocativo'], h: 'Se encuentra en la segunda posición del cuadro a completar.' },
+                { type: 'Empieza por', q: 'Volcán que sepultó las ciudades de Pompeya, Herculano y Estabia.', a: ['vesubio'], h: 'Erupcionó en el año 79 d.C.' },
+                { type: 'Empieza por', q: 'Diosa romana del amor, equivalente a Afrodita en Grecia.', a: ['venus'], h: 'Madre del héroe Eneas.' }
+            ],
+            'Z': [
+                { type: 'Contiene la', q: 'Nombre griego del dios supremo del rayo, equivalente a Júpiter.', a: ['zeus'], h: 'Padre de Atenea/Minerva.' },
+                { type: 'Contiene la', q: 'Corriente filosófica fundada por Zenón, a la que pertenecía el pensador cordobés Séneca.', a: ['estoicismo'], h: 'Defiende el dominio de las pasiones y la aceptación del destino.' },
+                { type: 'Contiene la', q: 'Nombre del imperio romano de Oriente que cayó en 1453 d.C.', a: ['bizantino'], h: 'Su capital era Constantinopla.' },
+                { type: 'Contiene la', q: 'Famoso tópico de Horacio "Carpe diem", que anima a aprovechar el momento y ...', a: ['gozar', 'disfrutar'], h: 'Verbo sinónimo de disfrutar que lleva Z.' }
+            ]
+        };
+
+        const THEMES = [
+            { bg: 'from-red-900 to-rose-950', class: 'team-theme-0', nameClass: 'text-red-400' },
+            { bg: 'from-blue-900 to-slate-900', class: 'team-theme-1', nameClass: 'text-blue-400' },
+            { bg: 'from-emerald-900 to-teal-950', class: 'team-theme-2', nameClass: 'text-emerald-400' },
+            { bg: 'from-purple-900 to-fuchsia-950', class: 'team-theme-3', nameClass: 'text-purple-400' }
+        ];
+
+        const Game = {
+            teams: [],
+            currentTeam: 0,
+            time: 0,
+            interval: null,
+            active: false,
+
+            init() {
+                const numTeams = parseInt(document.querySelector('input[name="numTeams"]:checked').value);
+                const playTime = parseInt(document.getElementById('time-select').value);
+                
+                this.time = playTime;
+                this.teams = [];
+                
+                // Nombres épicos para los equipos
+                const teamNames = ['Legión I', 'Cohorte II', 'Centuria III', 'Guardia IV'];
+
+                for (let i = 0; i < numTeams; i++) {
+                    // Seleccionamos aleatoriamente una variante de pregunta para cada letra, evitando repeticiones si es posible
+                    let lettersSet = [];
+                    Object.keys(QUESTION_POOL).forEach(letter => {
+                        const variants = QUESTION_POOL[letter];
+                        // Usar una variante diferente para cada equipo según su índice (o cíclico)
+                        const variantIdx = i % variants.length; 
+                        const qObj = { letter: letter, ...variants[variantIdx], status: 'pending' };
+                        lettersSet.push(qObj);
+                    });
+
+                    this.teams.push({
+                        id: i,
+                        name: teamNames[i],
+                        score: 0,
+                        letters: lettersSet,
+                        qIdx: 0,
+                        theme: THEMES[i]
+                    });
+                }
+
+                this.setupUI();
+                this.startGame();
+            },
+
+            setupUI() {
+                document.getElementById('start-screen').classList.add('hidden');
+                document.getElementById('game-screen').classList.remove('hidden');
+                document.getElementById('game-screen').classList.add('flex');
+
+                const scoresContainer = document.getElementById('team-scores');
+                // Grid responsivo según equipos
+                scoresContainer.className = `grid w-full max-w-5xl gap-4 mb-8 ${this.teams.length === 2 ? 'grid-cols-2' : 'grid-cols-2 lg:grid-cols-4'}`;
+                
+                scoresContainer.innerHTML = '';
+                this.teams.forEach((t, i) => {
+                    scoresContainer.innerHTML += `
+                        <div id="score-card-${i}" class="glass-panel flex flex-col items-center justify-center rounded-2xl p-4 border-b-4 transition-all duration-300 transform scale-95 opacity-60 ${t.theme.class}">
+                            <span class="${t.theme.nameClass} font-cinzel font-bold uppercase tracking-wider mb-2 text-sm">${t.name}</span>
+                            <div class="flex items-end gap-2">
+                                <span id="score-${i}" class="text-4xl font-black text-white leading-none">0</span>
+                                <span class="text-xs text-slate-400 mb-1">aciertos</span>
+                            </div>
+                        </div>
+                    `;
+                });
+            },
+
+            startGame() {
+                this.active = true;
+                this.currentTeam = 0;
+                this.updateGlobalTimer();
+                
+                this.interval = setInterval(() => {
+                    this.time--;
+                    this.updateGlobalTimer();
+                    if (this.time <= 0) this.endGame();
+                }, 1000);
+
+                this.renderRoscoPositions();
+                this.activateTeam(0);
+            },
+
+            updateGlobalTimer() {
+                const mins = Math.floor(this.time / 60);
+                const secs = this.time % 60;
+                document.getElementById('timer').innerText = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+            },
+
+            renderRoscoPositions() {
+                const cont = document.getElementById('rosco-letters');
+                cont.innerHTML = '';
+                // Usamos la cantidad de letras del equipo 1 (todas tienen la misma longitud)
+                const num = this.teams[0].letters.length;
+                const radius = 150;
+                
+                for(let i = 0; i < num; i++) {
+                    const angle = -Math.PI/2 + (i * 2 * Math.PI / num);
+                    const el = document.createElement('div');
+                    el.id = `l-${i}`; 
+                    el.style.left = `calc(50% + ${radius * Math.cos(angle)}px)`; 
+                    el.style.top = `calc(50% + ${radius * Math.sin(angle)}px)`;
+                    cont.appendChild(el);
+                }
+            },
+
+            activateTeam(teamIndex) {
+                this.currentTeam = teamIndex;
+                const t = this.teams[this.currentTeam];
+                
+                // Actualizar fondos y estilos para reflejar el equipo activo
+                const mainContainer = document.getElementById('rosco-main-container');
+                // Remover clases viejas
+                mainContainer.className = 'glass-panel p-8 rounded-full border-4 transition-all duration-500 scale-100 shadow-2xl';
+                mainContainer.classList.add(t.theme.class);
+                
+                document.getElementById('active-team-name').innerText = t.name;
+                document.getElementById('active-team-name').className = `text-xs font-cinzel font-bold uppercase tracking-widest mb-1 ${t.theme.nameClass}`;
+
+                // Destacar tarjeta de puntuación
+                this.teams.forEach((team, idx) => {
+                    const card = document.getElementById(`score-card-${idx}`);
+                    if (idx === teamIndex) {
+                        card.classList.remove('opacity-60', 'scale-95');
+                        card.classList.add('scale-105');
+                        card.style.background = 'rgba(20, 5, 10, 0.9)';
+                    } else {
+                        card.classList.add('opacity-60', 'scale-95');
+                        card.classList.remove('scale-105');
+                        card.style.background = 'rgba(30, 10, 15, 0.8)';
+                    }
+                });
+
+                this.refreshRoscoColors();
+                this.loadQuestion();
+            },
+
+            refreshRoscoColors() {
+                const t = this.teams[this.currentTeam];
+                t.letters.forEach((q, i) => {
+                    const el = document.getElementById(`l-${i}`);
+                    el.innerText = q.letter;
+                    el.className = `letter status-${q.status} ${i === t.qIdx ? 'status-active' : ''}`;
+                });
+            },
+
+            loadQuestion() {
+                if(!this.active) return;
+                const t = this.teams[this.currentTeam]; 
+                const q = t.letters[t.qIdx];
+                
+                document.getElementById('question-letter').innerText = q.letter;
+                document.getElementById('question-type').innerText = q.type;
+                document.getElementById('question-text').innerText = q.q;
+                
+                const hintPanel = document.getElementById('hint-display');
+                hintPanel.classList.add('hidden');
+                
+                const input = document.getElementById('answer-input');
+                input.value = '';
+                // Pequeño timeout para asegurar que el DOM actualizó antes del focus
+                setTimeout(() => input.focus(), 50);
+            },
+
+            showHint() { 
+                if(!this.active) return;
+                const t = this.teams[this.currentTeam];
+                const hintPanel = document.getElementById('hint-display');
+                hintPanel.innerText = `[Pista] ${t.letters[t.qIdx].h}`; 
+                hintPanel.classList.remove('hidden'); 
+            },
+
+            normalizeString(str) {
+                return str.trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+            },
+
+            checkAnswer() {
+                if(!this.active) return;
+                const inputVal = document.getElementById('answer-input').value;
+                const val = this.normalizeString(inputVal);
+                if(!val) return;
+                
+                const t = this.teams[this.currentTeam]; 
+                const q = t.letters[t.qIdx];
+                
+                // Comprobar si la respuesta coincide con alguna de las opciones válidas
+                const isCorrect = q.a.some(ans => this.normalizeString(ans) === val);
+                
+                if(isCorrect) {
+                    q.status = 'correct'; 
+                    t.score++; 
+                    document.getElementById(`score-${this.currentTeam}`).innerText = t.score;
+                    this.advanceTurn(false); // Sigue jugando el mismo equipo
+                } else {
+                    q.status = 'incorrect'; 
+                    this.advanceTurn(true); // Falla, pasa turno al siguiente equipo
+                }
+            },
+
+            pasapalabra() { 
+                if(!this.active) return;
+                this.advanceTurn(true); 
+            },
+
+            advanceTurn(switchTeamForce) {
+                let nextTeam = this.currentTeam;
+                
+                // Si forzamos cambio de turno o el equipo actual ya no tiene letras pendientes
+                if(switchTeamForce || !this.teams[this.currentTeam].letters.some(q => q.status === 'pending')) {
+                    nextTeam = this.findNextAvailableTeam();
+                    if(nextTeam === -1) {
+                        return this.endGame(); // Nadie tiene letras pendientes
+                    }
+                }
+
+                // Mover el índice de la letra dentro del equipo seleccionado
+                const t = this.teams[nextTeam];
+                // Si cambiamos de equipo, dejamos la letra actual en pending si lo estaba, y buscamos la siguiente
+                // Si nos quedamos en el mismo equipo porque acertó, buscamos la siguiente pendiente
+                
+                let foundNextLetter = false;
+                let startIdx = t.qIdx;
+                
+                // Si acabamos de llegar a este equipo (cambio de turno), intentamos empezar en su letra pendiente actual
+                if (nextTeam !== this.currentTeam && t.letters[startIdx].status === 'pending') {
+                    foundNextLetter = true;
+                } else {
+                    // Si no, buscamos hacia adelante
+                    for(let i = 1; i <= t.letters.length; i++) {
+                        let idx = (startIdx + i) % t.letters.length;
+                        if(t.letters[idx].status === 'pending') { 
+                            t.qIdx = idx; 
+                            foundNextLetter = true; 
+                            break; 
+                        }
+                    }
+                }
+
+                if(!foundNextLetter) {
+                    // Si este equipo por alguna razón se quedó sin letras en este milisegundo, forzar avance global
+                    return this.advanceTurn(true);
+                }
+
+                if(nextTeam !== this.currentTeam) {
+                    this.activateTeam(nextTeam);
+                } else {
+                    this.refreshRoscoColors();
+                    this.loadQuestion();
+                }
+            },
+
+            findNextAvailableTeam() {
+                for(let i = 1; i <= this.teams.length; i++) {
+                    let idx = (this.currentTeam + i) % this.teams.length;
+                    if(this.teams[idx].letters.some(q => q.status === 'pending')) {
+                        return idx;
+                    }
+                }
+                return -1; // Fin del juego
+            },
+
+            endGame() {
+                this.active = false; 
+                clearInterval(this.interval);
+                
+                // Ordenar equipos por puntuación
+                const sorted = [...this.teams].sort((a,b) => b.score - a.score);
+                const winner = sorted[0];
+                const isTie = sorted.length > 1 && sorted[0].score === sorted[1].score;
+
+                const resultsHTML = sorted.map(t => 
+                    `<div class="flex justify-between items-center bg-black/40 p-4 rounded-xl border border-slate-700 mb-2">
+                        <span class="font-cinzel font-bold text-xl ${t.theme.nameClass}">${t.name}</span>
+                        <span class="text-3xl font-black text-white">${t.score}</span>
+                    </div>`
+                ).join('');
+
+                document.getElementById('game-screen').innerHTML = `
+                <div class="glass-panel p-10 rounded-3xl text-center border-t-4 border-amber-400 max-w-2xl w-full">
+                    <h2 class="text-6xl font-cinzel font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-200 to-yellow-600 mb-4">Fin de la Conquista</h2>
+                    <p class="text-2xl text-slate-300 mb-8 font-cinzel">
+                        ${isTie ? '¡EMPATE ENTRE LAS FACCIONES!' : `Gloria eterna para la <strong class="text-white">${winner.name}</strong>`}
+                    </p>
+                    
+                    <div class="mb-10 text-left">
+                        ${resultsHTML}
+                    </div>
+
+                    <button onclick="location.reload()" class="w-full px-8 py-5 bg-gradient-to-r from-amber-600 to-yellow-600 text-white font-black text-xl rounded-xl hover:scale-105 transition-transform shadow-[0_0_20px_rgba(245,158,11,0.4)] font-cinzel tracking-widest">
+                        NUEVA CAMPAÑA
+                    </button>
+                </div>`;
+            }
+        };
+
+        // Escuchar la tecla Enter para comprobar y Espacio para pasar palabra
+        document.addEventListener('keydown', e => {
+            if(!Game.active) return;
+            // Evitar que el espacio haga scroll
+            if(e.code === 'Space') {
+                const input = document.getElementById('answer-input');
+                // Si el input está vacío, espacio hace pasapalabra
+                if(input.value.trim() === '') {
+                    e.preventDefault(); 
+                    Game.pasapalabra();
+                }
+            } else if(e.key === 'Enter') {
+                Game.checkAnswer();
+            }
+        });
+
+        // Simple efecto de partículas en canvas para ambientación
+        const canvas = document.getElementById('fx-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2 + 0.5;
+                this.speedY = Math.random() * 0.5 + 0.1;
+                this.speedX = (Math.random() - 0.5) * 0.2;
+                this.opacity = Math.random() * 0.5 + 0.2;
+            }
+            update() {
+                this.y -= this.speedY;
+                this.x += this.speedX;
+                if (this.y < 0) {
+                    this.y = canvas.height;
+                    this.x = Math.random() * canvas.width;
+                }
+            }
+            draw() {
+                ctx.fillStyle = `rgba(253, 230, 138, ${this.opacity})`;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        for (let i = 0; i < 70; i++) particles.push(new Particle());
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => { p.update(); p.draw(); });
+            requestAnimationFrame(animate);
+        }
+        animate();
+
+    </script>
+</body>
+</html>

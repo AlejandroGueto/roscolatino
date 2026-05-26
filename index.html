@@ -130,141 +130,139 @@
     </div>
 
     <script>
-        // Banco de preguntas expandido (4 variantes por letra para asegurar diversidad en múltiples equipos)
-        // Basado estrictamente en los contenidos de gramática, cultura y traducción provistos.
+        // Banco de preguntas expandido (4 variantes rigurosamente corregidas)
         const QUESTION_POOL = {
             'A': [
-                { type: 'Empieza por', q: 'Diosa romana de la sabiduría y la guerra estratégica, equivalente a Atenea.', a: ['minerva'], h: 'Formaba parte de la Tríada Capitolina (M...).' }, // Contiene A, pero espera. La letra es A. Corregido:
-                { type: 'Empieza por', q: 'Caso de la declinación latina que suele realizar la función sintáctica de Complemento Directo.', a: ['acusativo'], h: 'Suele terminar en -m en el singular de casi todas las declinaciones.' },
-                { type: 'Empieza por', q: 'Batalla naval donde Octavio derrotó a Marco Antonio, marcando el fin de la República.', a: ['accio', 'actium'], h: 'Comienza por A y doble C.' },
-                { type: 'Empieza por', q: 'Edificio público romano destinado a las luchas de gladiadores y espectáculos con fieras.', a: ['anfiteatro'], h: 'El Coliseo es el más famoso de este tipo.' },
-                { type: 'Empieza por', q: 'Sustantivo latino de la primera declinación que aparece en la prueba y significa "agricultor".', a: ['agricola'], h: 'Su nominativo termina en -a pero es de género masculino.' }
+                { type: 'Empieza por', q: 'Caso de la declinación latina que suele realizar la función sintáctica de Complemento Directo.', a: ['acusativo'], h: 'Suele terminar en -m en singular.' },
+                { type: 'Empieza por', q: 'Batalla naval donde Octavio derrotó a Marco Antonio, marcando el fin de la República.', a: ['accio', 'actium'], h: 'Se libró en el año 31 a.C.' },
+                { type: 'Empieza por', q: 'Edificio público romano destinado a las luchas de gladiadores y espectáculos con fieras.', a: ['anfiteatro'], h: 'El Coliseo es el más famoso de su tipo.' },
+                { type: 'Empieza por', q: 'Sustantivo latino de la primera declinación propuesto en el documento que significa "agricultor".', a: ['agricola'], h: 'De género masculino aunque termine en -a.' }
             ],
             'B': [
-                { type: 'Empieza por', q: 'Dios romano del vino y la fiesta, equivalente al griego Dioniso.', a: ['baco'], h: 'Aparece en las opciones de dioses del inframundo como distractor.' },
-                { type: 'Empieza por', q: 'Edificio público de la antigua Roma que servía como tribunal de justicia y centro de negocios.', a: ['basilica'], h: 'Posteriormente los cristianos adoptaron su estructura para sus iglesias.' },
-                { type: 'Contiene la', q: 'Famosa obra histórica de Tito Livio: "A ... condita".', a: ['urbe'], h: 'Significa ciudad en latín.' },
-                { type: 'Contiene la', q: 'Último rey de Roma, apodado "El Soberbio".', a: ['tarquinio', 'tarquinio el soberbio'], h: 'Rey de origen etrusco.' }
+                { type: 'Empieza por', q: 'Dios romano del vino y la fiesta, que aparece como opción en la mitología del inframundo.', a: ['baco'], h: 'Equivalente al griego Dioniso.' },
+                { type: 'Empieza por', q: 'Edificio público de la antigua Roma que servía como tribunal de justicia y centro de negocios.', a: ['basilica'], h: 'Estructura adoptada luego por los cristianos.' },
+                { type: 'Contiene la', q: 'Palabra latina que significa ciudad, presente en la gran obra histórica de Tito Livio "Ab ... condita".', a: ['urbe'], h: 'Relativo a lo urbano.' },
+                { type: 'Contiene la', q: 'Apodo del último rey de Roma, de origen etrusco, llamado Tarquinio el...', a: ['soberbio'], h: 'Que tiene mucho orgullo y prepotencia.' }
             ],
             'C': [
                 { type: 'Empieza por', q: 'Máximo representante de la oratoria romana, autor de las "Catilinarias".', a: ['ciceron'], h: 'Gran político republicano.' },
                 { type: 'Empieza por', q: 'Magistratura más alta de la República romana, elegida anualmente y formada por dos personas.', a: ['consul'], h: 'Daban nombre al año.' },
-                { type: 'Empieza por', q: 'Poeta lírico romano que cantó su amor por una mujer a la que llamó "Lesbia".', a: ['catulo'], h: 'Aparece en las preguntas de literatura.' },
-                { type: 'Empieza por', q: 'Ciudad del norte de África que se enfrentó a Roma por el dominio del Mediterráneo.', a: ['cartago'], h: 'Las guerras contra ellos se llamaron Púnicas.' }
+                { type: 'Empieza por', q: 'Poeta lírico romano que cantó su amor por una mujer a la que llamó "Lesbia".', a: ['catulo'], h: 'Famoso por su poema "Odio y amo".' },
+                { type: 'Empieza por', q: 'Ciudad del norte de África que se enfrentó a Roma por el dominio del Mediterráneo.', a: ['cartago'], h: 'Su gran líder fue Aníbal.' }
             ],
             'D': [
-                { type: 'Empieza por', q: 'Caso de la declinación latina utilizado para expresar el Complemento Indirecto.', a: ['dativo'], h: 'Indica quién recibe el daño o provecho de la acción.' },
-                { type: 'Empieza por', q: 'Diosa romana de la caza y los bosques, equivalente a la griega Artemisa.', a: ['diana'], h: 'Hermana de Apolo.' },
-                { type: 'Contiene la', q: 'Gran epopeya escrita por Virgilio para glorificar los orígenes de Roma.', a: ['eneida'], h: 'Narra la huida de Troya.' },
-                { type: 'Contiene la', q: 'Emperador que promulgó la libertad de religión en el Imperio en 313 d.C. a través de un edicto.', a: ['constantino', 'constantino i'], h: 'El edicto fue firmado en Milán.' }
+                { type: 'Empieza por', q: 'Caso de la declinación latina utilizado principalmente para expresar el Complemento Indirecto.', a: ['dativo'], h: 'Indica quién recibe el daño o provecho.' },
+                { type: 'Empieza por', q: 'Diosa romana de la caza y los bosques, hermana de Apolo.', a: ['diana'], h: 'Equivalente a la griega Artemisa.' },
+                { type: 'Contiene la', q: 'Gran epopeya escrita por Virgilio para glorificar los orígenes de Roma.', a: ['eneida'], h: 'Narra la historia de un héroe troyano.' },
+                { type: 'Empieza por', q: 'Conjuntos de terminaciones que agrupan a los sustantivos y adjetivos en latín.', a: ['declinaciones', 'declinacion'], h: 'Existen cinco diferentes.' }
             ],
             'E': [
-                { type: 'Empieza por', q: 'Clase social de la República formada por caballeros, situada por debajo de los patricios.', a: ['equites'], h: 'Aparece como opción junto a plebeyos y libertos.' },
-                { type: 'Empieza por', q: 'Documento legal promulgado en Milán que daba fin a las persecuciones cristianas.', a: ['edicto', 'edicto de milan'], h: 'Promulgado por Constantino.' },
-                { type: 'Empieza por', q: 'Ciudad romana sepultada por la erupción del volcán Vesubio junto a Pompeya y Herculano.', a: ['estabia'], h: 'Termina en -ia.' },
-                { type: 'Contiene la', q: 'Término latino del texto a traducir que significa "anciano" (senex, ...).', a: ['senex'], h: 'Aparece atado con cadenas (catenis) en el texto de Plinio.' }
+                { type: 'Empieza por', q: 'Clase social de la República formada por los caballeros, situada por debajo de los patricios.', a: ['equites'], h: 'Su nombre viene de caballo (equus).' },
+                { type: 'Empieza por', q: 'Documento legal promulgado en Milán que daba fin a las persecuciones cristianas.', a: ['edicto', 'edicto de milan'], h: 'Emitido en el año 313 d.C.' },
+                { type: 'Empieza por', q: 'Ciudad romana sepultada por la erupción del volcán Vesubio junto a Pompeya y Herculano.', a: ['estabia'], h: 'Es la menos conocida de las tres.' },
+                { type: 'Contiene la', q: 'Término latino del texto a traducir que significa "anciano".', a: ['senex'], h: 'Raíz de la palabra Senado.' }
             ],
             'F': [
                 { type: 'Empieza por', q: 'Plaza principal y centro neurálgico, comercial y político de las ciudades romanas.', a: ['foro'], h: 'Equivalente al ágora griega.' },
-                { type: 'Empieza por', q: 'Palabra latina del texto de Plinio que significa "hierro" (en genitivo).', a: ['ferri'], h: 'Aparece junto a "sonus" (sonus ...).' },
-                { type: 'Contiene la', q: 'Espectáculo con animales salvajes que se realizaba en los anfiteatros.', a: ['fieras'], h: 'Luchas de gladiadores y...' },
-                { type: 'Contiene la', q: 'Famosa obra de Ovidio que recopila más de 250 mitos que terminan en una transformación.', a: ['metamorfosis', 'las metamorfosis'], h: 'La palabra significa "cambio de forma".' }
+                { type: 'Empieza por', q: 'Palabra latina del texto de Plinio que significa "hierro" (en genitivo, "sonus ...").', a: ['ferri'], h: 'Genera el ruido de las cadenas.' },
+                { type: 'Empieza por', q: 'Animales salvajes usados en los espectáculos de los anfiteatros.', a: ['fieras'], h: 'Luchaban contra gladiadores o entre ellas.' },
+                { type: 'Contiene la', q: 'Famosa obra de Ovidio que recopila más de 250 mitos que terminan en una transformación.', a: ['metamorfosis', 'las metamorfosis'], h: 'Su título significa literalmente "cambio de forma".' }
             ],
             'G': [
                 { type: 'Empieza por', q: 'Caso de la declinación latina que suele indicar posesión o Complemento del Nombre.', a: ['genitivo'], h: 'Suele traducirse con la preposición "de".' },
-                { type: 'Empieza por', q: 'Nombre que recibían las guerras que enfrentaron a Roma contra Cartago.', a: ['guerras punicas', 'punicas'], h: 'Fueron tres enfrentamientos en total.' },
-                { type: 'Empieza por', q: 'Adjetivo latino de la tercera declinación propuesto para declinar que significa "pesado".', a: ['gravis'], h: 'Su enunciado es ...-is, -e.' },
-                { type: 'Contiene la', q: 'Primer rey de Roma tras asesinar a su hermano.', a: ['romulo'], h: 'Amamantado por una loba.' }
+                { type: 'Empieza por', q: 'Adjetivo latino de la tercera declinación propuesto para declinar que significa "pesado" o "grave".', a: ['gravis'], h: 'Termina en -is, -e.' },
+                { type: 'Contiene la', q: 'Título concedido a Octavio que lo convirtió en el primer emperador de Roma.', a: ['augusto'], h: 'Significa majestuoso o venerable.' },
+                { type: 'Contiene la', q: 'Poeta romano autor de la epopeya que glorifica los orígenes de Roma.', a: ['virgilio'], h: 'Escribió la Eneida.' }
             ],
             'H': [
-                { type: 'Empieza por', q: 'Poeta romano que acuñó el famoso tópico literario "Carpe diem".', a: ['horacio'], h: 'Contemporáneo de Virgilio.' },
-                { type: 'Empieza por', q: 'Ciudad sepultada bajo un río de lodo hirviendo por el volcán Vesubio junto a Pompeya.', a: ['herculano'], h: 'Su nombre hace honor al héroe de los doce trabajos.' },
-                { type: 'Contiene la', q: 'Profesión de Atenodoro, el hombre que decide alquilar la casa encantada en el texto de Plinio.', a: ['philosophus', 'filosofo'], h: 'Empieza por Ph- en el texto latino.' },
-                { type: 'Contiene la', q: 'Palabra del texto latino que significa aparición, aparición irreal o fantasma.', a: ['phantasma'], h: 'Aparece de súbito ("Subito ... advenit").' }
+                { type: 'Empieza por', q: 'Poeta romano que acuñó el famoso tópico literario "Carpe diem".', a: ['horacio'], h: 'Autor de Odas y Épodos.' },
+                { type: 'Empieza por', q: 'Ciudad sepultada bajo un río de lodo volcánico por el Vesubio junto a Pompeya.', a: ['herculano'], h: 'Su nombre rinde honor a un héroe mitológico.' },
+                { type: 'Empieza por', q: 'Palabra latina que acompaña a "cursus" para referirse a la carrera política romana.', a: ['honorum'], h: 'Significa "de los honores".' },
+                { type: 'Contiene la', q: 'Nombre original en latín del filósofo que protagoniza el relato de la casa encantada.', a: ['athenodorus', 'athenodoro'], h: 'Procede de la ciudad de Atenas.' }
             ],
             'I': [
-                { type: 'Empieza por', q: 'Periodo histórico de Roma que se inicia tras la caída de la República.', a: ['imperio', 'imperio romano'], h: 'Octavio Augusto fue el primero en gobernarlo.' },
-                { type: 'Empieza por', q: 'Palabra latina del texto de Plinio que significa ídolo o espectro ("Mox apparebat...").', a: ['idolum'], h: 'Aparecía después del ruido de cadenas.' },
-                { type: 'Contiene la', q: 'Historiador romano que narra la historia de Roma desde su fundación ("Ab urbe condita").', a: ['tito livio'], h: 'Autor de nombre compuesto.' },
-                { type: 'Contiene la', q: 'Clase social formada por los descendientes de las primeras familias de Roma.', a: ['patricios'], h: 'Ocupaban los altos cargos en la República.' }
+                { type: 'Empieza por', q: 'Periodo histórico de Roma que se inicia tras la caída de la República.', a: ['imperio', 'imperio romano'], h: 'Gobernado por emperadores.' },
+                { type: 'Empieza por', q: 'Palabra latina del texto de Plinio que significa ídolo o espectro.', a: ['idolum'], h: 'Aparecía misteriosamente en la casa.' },
+                { type: 'Contiene la', q: 'Historiador romano que narra la historia de Roma desde su fundación en "Ab urbe condita".', a: ['tito livio'], h: 'Escribió 142 libros de historia.' },
+                { type: 'Contiene la', q: 'Clase social formada por los descendientes de las primeras familias fundadoras de Roma.', a: ['patricios'], h: 'Ocupaban los altos cargos políticos.' }
             ],
             'J': [
-                { type: 'Empieza por', q: 'Diosa romana, equivalente a la griega Hera, esposa del dios supremo.', a: ['juno'], h: 'En sus opciones aparecen Venus, Minerva y Diana.' },
-                { type: 'Empieza por', q: 'Nombre del general cuyo asesinato marca el final de la República y abre paso al Imperio.', a: ['julio', 'julio cesar'], h: 'Dictador vitalicio asesinado en los idus de marzo.' },
-                { type: 'Contiene la', q: 'Emperador romano hispano que aparece como opción incorrecta en la pregunta sobre el Edicto de Milán.', a: ['trajano'], h: 'Nacido en Itálica (Sevilla).' },
-                { type: 'Contiene la', q: 'Adjetivo del cuadro de declinaciones que significa "desdichado" o "pobre" (miser, -a, -um).', a: ['adjetivo', 'adjetivos'], h: 'Acompaña al sustantivo y concuerda con él.' }
+                { type: 'Empieza por', q: 'Diosa romana equivalente a la griega Hera, esposa del dios supremo.', a: ['juno'], h: 'Diosa del matrimonio y reina de los dioses.' },
+                { type: 'Empieza por', q: 'Nombre de pila del dictador vitalicio cuyo asesinato dio paso al fin de la República.', a: ['julio', 'julio cesar'], h: 'Conquistador de la Galia.' },
+                { type: 'Contiene la', q: 'Emperador romano hispano que aparece como opción incorrecta en la pregunta sobre el Edicto de Milán.', a: ['trajano'], h: 'Nacido en Itálica.' },
+                { type: 'Contiene la', q: 'Tipos de palabras en latín de las que se pregunta cuántas clases existen (como miser, -a, -um).', a: ['adjetivo', 'adjetivos'], h: 'Concuerdan con el sustantivo.' }
             ],
             'L': [
-                { type: 'Empieza por', q: 'Nombre o pseudónimo literario con el que el poeta Catulo llamaba a su amada en sus poemas.', a: ['lesbia'], h: 'Inspirado en la isla de la poetisa Safo.' },
-                { type: 'Empieza por', q: 'Apellido del historiador que escribió "Ab urbe condita" (Tito ...).', a: ['livio'], h: 'Historiador de la época de Augusto.' },
-                { type: 'Contiene la', q: 'Comediógrafo romano autor de grandes obras, que conforma pareja literaria con Terencio.', a: ['plauto'], h: 'Autor de la "Aulularia".' },
-                { type: 'Contiene la', q: 'Dios romano del inframundo y los muertos.', a: ['pluton'], h: 'Hermano de Júpiter y Neptuno.' }
+                { type: 'Empieza por', q: 'Nombre o pseudónimo literario con el que el poeta Catulo llamaba a su amada.', a: ['lesbia'], h: 'Inspirado en la isla de Safo.' },
+                { type: 'Empieza por', q: 'Apellido del historiador que escribió "Ab urbe condita" (Tito ...).', a: ['livio'], h: 'Historiador romano clásico.' },
+                { type: 'Contiene la', q: 'Comediógrafo romano de obras muy populares, que hace pareja literaria con Terencio.', a: ['plauto'], h: 'Autor de la Aulularia.' },
+                { type: 'Contiene la', q: 'Dios romano del inframundo y los muertos.', a: ['pluton'], h: 'Equivalente al griego Hades.' }
             ],
             'M': [
                 { type: 'Empieza por', q: 'Diosa romana equivalente a la griega Atenea.', a: ['minerva'], h: 'Diosa de la sabiduría.' },
                 { type: 'Empieza por', q: 'Dios romano de la guerra, padre de Rómulo y Remo.', a: ['marte'], h: 'Equivalente al griego Ares.' },
-                { type: 'Empieza por', q: 'Ciudad donde Constantino I promulgó su famoso Edicto en el 313 d.C.', a: ['milan'], h: 'Ciudad del norte de Italia.' },
-                { type: 'Empieza por', q: 'Palabra que aparece en el texto para designar a la extraña criatura o prodigio ("... ab Athenodoro videtur").', a: ['monstrum'], h: 'En español deriva a monstruo.' }
+                { type: 'Empieza por', q: 'Ciudad de la actual Italia donde Constantino I promulgó su famoso Edicto de tolerancia.', a: ['milan'], h: 'Capital de Lombardía en la actualidad.' },
+                { type: 'Empieza por', q: 'Palabra que aparece en el texto para designar al prodigio o aparición ("... ab Athenodoro videtur").', a: ['monstrum'], h: 'De ella deriva la palabra monstruo.' }
             ],
             'N': [
-                { type: 'Empieza por', q: 'Caso de la declinación que cumple la función de Sujeto o Atributo.', a: ['nominativo'], h: 'Es el primer caso de la tabla.' },
-                { type: 'Empieza por', q: 'Emperador romano que tuvo como tutor al filósofo estoico Séneca.', a: ['neron'], h: 'El último emperador de la dinastía Julio-Claudia.' },
+                { type: 'Empieza por', q: 'Caso de la declinación que cumple la función principal de Sujeto o Atributo.', a: ['nominativo'], h: 'Es el primer caso del paradigma.' },
+                { type: 'Empieza por', q: 'Emperador romano que tuvo como tutor al filósofo estoico Séneca.', a: ['neron'], h: 'Famoso por el incendio de Roma.' },
                 { type: 'Empieza por', q: 'Dios romano de los mares y los océanos.', a: ['neptuno'], h: 'Equivalente al griego Poseidón.' },
-                { type: 'Contiene la', q: 'Sistema político romano abolido por Octavio Augusto.', a: ['republica'], h: 'Gobernado por Cónsules y el Senado.' }
+                { type: 'Empieza por', q: 'Según las opciones del documento, rey pacífico sucesor de Rómulo (... Pompilio).', a: ['numa', 'numa pompilio'], h: 'Organizó el calendario romano.' }
             ],
             'O': [
-                { type: 'Empieza por', q: 'Nombre del vencedor en la batalla de Accio, que inauguró el Imperio.', a: ['octavio', 'octavio augusto', 'augusto'], h: 'Hijo adoptivo de Julio César.' },
-                { type: 'Empieza por', q: 'Poeta romano autor de la famosa obra "Las metamorfosis".', a: ['ovidio'], h: 'Escribió también el "Arte de amar".' },
-                { type: 'Empieza por', q: 'Palabra latina del texto de Plinio que significa "huesos".', a: ['ossa'], h: 'El filósofo los encuentra en el patio ("in area invenit").' },
-                { type: 'Empieza por', q: 'Ciudad portuaria de Roma que aparece como opción incorrecta en la pregunta sobre el Vesubio.', a: ['ostia'], h: 'Situada en la desembocadura del río Tíber.' }
+                { type: 'Empieza por', q: 'Nombre original del vencedor en la batalla de Accio, que inauguró el Imperio.', a: ['octavio', 'octavio augusto'], h: 'Adoptado por Julio César.' },
+                { type: 'Empieza por', q: 'Poeta romano autor de la famosa obra "Las metamorfosis".', a: ['ovidio'], h: 'Desterrado al Ponto Euxino.' },
+                { type: 'Empieza por', q: 'Palabra latina del texto de Plinio que significa "huesos".', a: ['ossa'], h: 'Se encontraron enterrados en el patio.' },
+                { type: 'Empieza por', q: 'Ciudad portuaria de Roma que aparece como opción en la pregunta sobre el Vesubio.', a: ['ostia'], h: 'Desembocadura del Tíber.' }
             ],
             'P': [
-                { type: 'Empieza por', q: 'Clase social descendiente de las familias fundadoras de Roma.', a: ['patricios'], h: 'Se oponían a los plebeyos.' },
-                { type: 'Empieza por', q: 'Ciudad destruida y sepultada por la erupción del Vesubio en el 79 d.C.', a: ['pompeya'], h: 'Sus ruinas están cerca de Nápoles.' },
-                { type: 'Empieza por', q: 'Comediógrafo romano, contemporáneo de Terencio.', a: ['plauto'], h: 'Sus obras eran de carácter muy cómico y popular.' },
-                { type: 'Empieza por', q: 'Adjetivo que define las guerras que enfrentaron a romanos y cartagineses.', a: ['punicas'], h: 'Deriva del nombre que daban a los fenicios.' }
+                { type: 'Empieza por', q: 'Clase social descendiente de las familias fundadoras de Roma.', a: ['patricios'], h: 'Clase alta de la República.' },
+                { type: 'Empieza por', q: 'Ciudad destruida y sepultada por la erupción del Vesubio en el 79 d.C.', a: ['pompeya'], h: 'Junto a Herculano y Estabia.' },
+                { type: 'Empieza por', q: 'Comediógrafo romano de origen humilde, contemporáneo de Terencio.', a: ['plauto'], h: 'Teatro de enredo.' },
+                { type: 'Empieza por', q: 'Magistratura romana del cursus honorum dedicada principalmente a la justicia.', a: ['pretor'], h: 'Estaba justo por debajo del cónsul.' }
             ],
             'Q': [
-                { type: 'Contiene la', q: 'Magistratura romana menor encargada de las finanzas y los impuestos.', a: ['cuestor'], h: 'Parte inferior del cursus honorum.' },
-                { type: 'Contiene la', q: 'Rey etrusco expulsado de Roma, dando paso a la República ("Tarquinio el Soberbio").', a: ['tarquinio'], h: 'Último rey de la monarquía.' },
-                { type: 'Contiene la', q: 'Nombre de la clase social de los caballeros en Roma, inferior a los patricios.', a: ['equites'], h: 'Proviene de la palabra caballo (equus).' },
-                { type: 'Contiene la', q: 'Nombre de pila del autor de las "Catilinarias" y gran orador (Marco Tulio ...).', a: ['marco', 'marco tulio'], h: 'El apellido es Cicerón.' }
+                { type: 'Contiene la', q: 'Último rey de Roma, de origen etrusco, cuya expulsión dio paso a la República (Tar... el Soberbio).', a: ['tarquinio'], h: 'Soberano tiránico.' },
+                { type: 'Contiene la', q: 'Nombre de la clase social de los caballeros en Roma, inferior a los patricios.', a: ['equites'], h: 'Su poder radicaba en la economía y comercio.' },
+                { type: 'Empieza por', q: 'Famoso orador y maestro hispanorromano, opción de respuesta junto a Séneca.', a: ['quintiliano'], h: 'Autor de "Institutio Oratoria".' },
+                { type: 'Contiene la', q: 'Significado en español del verbo latino "conducit", acción que realiza el filósofo con la casa.', a: ['alquila', 'arrienda'], h: 'Pagar un precio por usar un inmueble temporalmente.' }
             ],
             'R': [
-                { type: 'Empieza por', q: 'Primer rey de Roma, tras acabar con la vida de su gemelo.', a: ['romulo'], h: 'Fundó la ciudad en el Palatino.' },
-                { type: 'Empieza por', q: 'Etapa de la historia de Roma cuyo final lo marca la victoria de Octavio Augusto.', a: ['republica'], h: 'Periodo intermedio entre Monarquía e Imperio.' },
-                { type: 'Empieza por', q: 'Hermano asesinado por el primer rey de Roma.', a: ['remo'], h: 'Cruzó el surco trazado por su hermano.' },
-                { type: 'Contiene la', q: 'Género literario teatral al que pertenecen autores como Plauto y Terencio.', a: ['comedia'], h: 'Busca hacer reír al espectador.' }
+                { type: 'Empieza por', q: 'Primer rey de Roma, tras acabar con la vida de su hermano gemelo.', a: ['romulo'], h: 'Fue amamantado por una loba.' },
+                { type: 'Empieza por', q: 'Etapa de la historia de Roma cuyo final lo marca la victoria de Octavio Augusto.', a: ['republica'], h: 'Gobernada por el Senado.' },
+                { type: 'Empieza por', q: 'Hermano gemelo asesinado por el primer rey de Roma.', a: ['remo'], h: 'Por saltar el surco sagrado.' },
+                { type: 'Empieza por', q: 'Ciudad eterna que dominó el Mediterráneo tras vencer a Cartago.', a: ['roma'], h: 'Capital del Imperio.' }
             ],
             'S': [
-                { type: 'Empieza por', q: 'Filósofo cordobés tutor del emperador Nerón y máximo representante del estoicismo.', a: ['seneca'], h: 'Autor de "Cartas a Lucilio".' },
-                { type: 'Empieza por', q: 'Historiador romano que aparece como opción; escribió sobre la conjuración de Catilina.', a: ['salustio'], h: 'Empieza por S y termina en -io.' },
-                { type: 'Empieza por', q: 'Término en latín que aparece en el texto traducido y hace referencia a un anciano ("... catenis trahebatur").', a: ['senex'], h: 'Raíz de la que proviene la palabra Senado.' },
-                { type: 'Contiene la', q: 'Ciudad de Italia sepultada por el Vesubio, junto con Pompeya y Herculano.', a: ['estabia'], h: 'Empieza por E.' }
+                { type: 'Empieza por', q: 'Filósofo cordobés, tutor del emperador Nerón y autor de "Cartas a Lucilio".', a: ['seneca'], h: 'Máximo representante del estoicismo.' },
+                { type: 'Empieza por', q: 'Historiador romano que aparece como opción incorrecta en la pregunta de "Ab urbe condita".', a: ['salustio'], h: 'Escribió "La conjuración de Catilina".' },
+                { type: 'Empieza por', q: 'Término en latín del texto que hace referencia al anciano arrastrado por cadenas.', a: ['senex'], h: 'Término relacionado con la vejez.' },
+                { type: 'Empieza por', q: 'Ciudad que aparece como opción en la pregunta sobre las ciudades sepultadas (opción D).', a: ['siracusa'], h: 'Ciudad griega en Sicilia.' }
             ],
             'T': [
-                { type: 'Empieza por', q: 'Baños públicos en la antigua Roma que servían para la higiene y relaciones sociales.', a: ['termas'], h: 'Contaban con salas como el caldarium o frigidarium.' },
-                { type: 'Empieza por', q: 'Historiador romano autor de la inmensa obra "Ab urbe condita" (... Livio).', a: ['tito', 'tito livio'], h: 'Su nombre tiene cuatro letras.' },
-                { type: 'Empieza por', q: 'Comediógrafo de origen africano representante del teatro romano junto a Plauto.', a: ['terencio'], h: 'Su comedia era más culta que la de Plauto.' },
-                { type: 'Empieza por', q: 'Historiador imperial romano que aparece como distractor en la pregunta sobre Tito Livio.', a: ['tacito'], h: 'Autor de los Anales.' }
+                { type: 'Empieza por', q: 'Baños públicos en la antigua Roma que servían para la higiene y las relaciones sociales.', a: ['termas'], h: 'Tenían salas de diferentes temperaturas.' },
+                { type: 'Empieza por', q: 'Nombre de pila del historiador romano autor de la inmensa obra "Ab urbe condita".', a: ['tito'], h: 'Su apellido es Livio.' },
+                { type: 'Empieza por', q: 'Comediógrafo de origen africano, que conforma la pareja literaria con Plauto.', a: ['terencio'], h: 'Escribió comedias más refinadas.' },
+                { type: 'Empieza por', q: 'Historiador imperial romano que aparece como distractor en la pregunta sobre la historia de Roma.', a: ['tacito'], h: 'Autor de los "Anales".' }
             ],
             'U': [
-                { type: 'Contiene la', q: 'Título concedido a Octavio que lo convirtió en el primer emperador.', a: ['augusto'], h: 'Significa "venerable" o "sagrado".' },
-                { type: 'Contiene la', q: 'Volcán que arrasó Pompeya en el año 79 d.C.', a: ['vesubio'], h: 'Monte situado frente a la bahía de Nápoles.' },
-                { type: 'Contiene la', q: 'Magistratura más alta de la República, ocupada por dos dirigentes.', a: ['consul'], h: 'Mandaban los ejércitos.' },
-                { type: 'Contiene la', q: 'Nombre del poeta que dedicó sus versos de amor a "Lesbia".', a: ['catulo'], h: 'Destacó en la poesía lírica.' }
+                { type: 'Contiene la', q: 'Título concedido a Octavio que significa "venerable".', a: ['augusto'], h: 'Dio nombre al mes de agosto.' },
+                { type: 'Contiene la', q: 'Volcán que arrasó Pompeya en el año 79 d.C.', a: ['vesubio'], h: 'Está cerca de Nápoles.' },
+                { type: 'Contiene la', q: 'Magistratura más alta de la República, ocupada por dos dirigentes al mismo tiempo.', a: ['consul'], h: 'Poseían el imperium.' },
+                { type: 'Contiene la', q: 'Poeta que dedicó apasionados versos de amor a "Lesbia".', a: ['catulo'], h: 'Poeta neotérico.' }
             ],
             'V': [
-                { type: 'Empieza por', q: 'Poeta autor de la Eneida, escrita para glorificar el origen de Roma.', a: ['virgilio'], h: 'Murió sin querer publicar su gran obra.' },
-                { type: 'Empieza por', q: 'Caso de la declinación que sirve para llamar o invocar a alguien.', a: ['vocativo'], h: 'Se encuentra en la segunda posición del cuadro a completar.' },
-                { type: 'Empieza por', q: 'Volcán que sepultó las ciudades de Pompeya, Herculano y Estabia.', a: ['vesubio'], h: 'Erupcionó en el año 79 d.C.' },
-                { type: 'Empieza por', q: 'Diosa romana del amor, equivalente a Afrodita en Grecia.', a: ['venus'], h: 'Madre del héroe Eneas.' }
+                { type: 'Empieza por', q: 'Poeta autor de la Eneida, escrita para glorificar el origen troyano de Roma.', a: ['virgilio'], h: 'Acompañó a Dante en la Divina Comedia.' },
+                { type: 'Empieza por', q: 'Caso de la declinación que sirve exclusivamente para llamar o invocar a alguien.', a: ['vocativo'], h: 'Suele ir entre comas.' },
+                { type: 'Empieza por', q: 'Montaña que sepultó las ciudades de Pompeya, Herculano y Estabia.', a: ['vesubio'], h: 'Volcán italiano.' },
+                { type: 'Empieza por', q: 'Diosa romana del amor y la belleza, equivalente a Afrodita.', a: ['venus'], h: 'Madre del héroe Eneas.' }
             ],
             'Z': [
-                { type: 'Contiene la', q: 'Nombre griego del dios supremo del rayo, equivalente a Júpiter.', a: ['zeus'], h: 'Padre de Atenea/Minerva.' },
-                { type: 'Contiene la', q: 'Corriente filosófica fundada por Zenón, a la que pertenecía el pensador cordobés Séneca.', a: ['estoicismo'], h: 'Defiende el dominio de las pasiones y la aceptación del destino.' },
-                { type: 'Contiene la', q: 'Nombre del imperio romano de Oriente que cayó en 1453 d.C.', a: ['bizantino'], h: 'Su capital era Constantinopla.' },
-                { type: 'Contiene la', q: 'Famoso tópico de Horacio "Carpe diem", que anima a aprovechar el momento y ...', a: ['gozar', 'disfrutar'], h: 'Verbo sinónimo de disfrutar que lleva Z.' }
+                { type: 'Empieza por', q: 'Dios de la mitología griega equivalente al dios romano Júpiter.', a: ['zeus'], h: 'Señor del Olimpo.' },
+                { type: 'Contiene la', q: 'Nombre del imperio de Oriente cuya caída en 1453 d.C. aparece en las fechas de la prueba.', a: ['bizantino'], h: 'Su capital fue Constantinopla.' },
+                { type: 'Contiene la', q: 'Traducción común de la idea que promueve el tópico literario "Carpe diem" (... del día).', a: ['gozar', 'disfrutar'], h: 'Aprovechar la vida.' },
+                { type: 'Contiene la', q: 'Accidente gramatical del verbo que puede ser "activa" o "pasiva".', a: ['voz'], h: 'Se solicita en el cuadro de análisis verbal.' }
             ]
         };
 
